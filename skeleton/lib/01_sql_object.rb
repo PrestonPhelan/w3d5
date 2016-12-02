@@ -99,7 +99,19 @@ class SQLObject
   end
 
   def update
-    # ...
+    updates = self.class.columns.map do |attr_name|
+      "#{attr_name} = ?"
+    end
+
+    update_string = updates.join(", ")
+    DBConnection.execute(<<-SQL, attribute_values, id)
+      UPDATE
+        #{self.class.table_name}
+      SET
+        #{update_string}
+      WHERE
+        id = ?
+    SQL
   end
 
   def save
