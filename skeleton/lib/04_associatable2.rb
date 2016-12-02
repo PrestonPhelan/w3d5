@@ -6,9 +6,10 @@ module Associatable
 
   def has_one_through(name, through_name, source_name)
     through_options = assoc_options[through_name]
-    source_options = through_options.model_class.assoc_options[source_name]
 
     define_method(name) do
+      source_options = through_options.model_class.assoc_options[source_name]
+      
       through_class = through_options.model_class
       through_fk_value = send(through_options.foreign_key)
       through_pk_column = through_options.primary_key.to_sym
