@@ -27,6 +27,18 @@ class Relation
 
     @model_class.parse_all(result)
   end
+
+  def where(params)
+    conditions = params
+
+    options.each do |k, v|
+      conditions[k] ||= v
+    end
+
+    model_class = self.model_class
+
+    Relation.new(model_class, conditions)
+  end
   #
   # def first
   #   execute_search.first

@@ -4,18 +4,7 @@ require_relative 'relation'
 
 module Searchable
   def where(params)
-    conditions = params
-
-    if self.is_a?(Relation)
-      options.each do |k, v|
-        conditions[k] ||= v
-      end
-      model_class = self.model_class
-    else
-      model_class = self
-    end
-
-    Relation.new(model_class, params)
+    Relation.new(self, params)
   end
 end
 
