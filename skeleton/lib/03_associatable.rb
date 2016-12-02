@@ -22,7 +22,7 @@ class BelongsToOptions < AssocOptions
   def initialize(name, options = {})
     @primary_key = options[:primary_key] || :id
     @foreign_key = options[:foreign_key] || "#{name}_id".to_sym
-    @class_name = options[:class_name] || name.camelcase.singularize
+    @class_name = options[:class_name] || name.to_s.camelcase.singularize
   end
 end
 
@@ -38,7 +38,14 @@ end
 module Associatable
   # Phase IIIb
   def belongs_to(name, options = {})
-    # ...
+    options = BelongsToOptions.new(name, options)
+
+    define_method(name) do
+      target_class = options.model_class
+      foreign_key_value = send(options.foreign_key)
+
+      target_class.where(options.primary_key.to_sym => foreign_key_value).first
+    end
   end
 
   def has_many(name, options = {})
@@ -52,4 +59,5 @@ end
 
 class SQLObject
   # Mixin Associatable here...
+  extend Associatable
 end
