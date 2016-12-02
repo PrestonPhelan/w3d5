@@ -42,12 +42,7 @@ class SQLObject
   end
 
   def self.parse_all(results)
-    objects = []
-    results.each do |result|
-      objects << self.new(result)
-    end
-
-    objects
+    results.map { |result| self.new(result) }
   end
 
   def self.find(id)
@@ -78,7 +73,6 @@ class SQLObject
   end
 
   def attribute_values
-
     self.class.columns.map do |column|
       send(column)
     end
@@ -115,10 +109,15 @@ class SQLObject
   end
 
   def save
-    if id
-      update
-    else
-      insert
+    id.nil? ? insert : update
+  end
+
+  def validates(*columns, options)
+    @presence = options[presence] || false
+    @uniqueness = options[uniqueness] || false
+
+    columns.each do |column|
+      ##validate column meets criteria
     end
   end
 end

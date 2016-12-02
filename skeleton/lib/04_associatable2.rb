@@ -10,8 +10,8 @@ module Associatable
     define_method(name) do
       source_options = through_options.model_class.assoc_options[source_name]
 
-      source_table = source_options.model_class.table_name
       through_table = through_options.model_class.table_name
+      source_table = source_options.model_class.table_name
 
       result = DBConnection.execute(<<-SQL)
       SELECT
@@ -24,7 +24,7 @@ module Associatable
         #{through_table}.#{through_options.primary_key} = #{send(through_options.foreign_key)}
       SQL
 
-      House.new(result.first)
+      source_options.model_class.parse_all(results).first
       #self.send(through_name).send(source_name), one-liner if you want it :-)
     end
 
