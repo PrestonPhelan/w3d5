@@ -31,7 +31,7 @@ class HasManyOptions < AssocOptions
     @primary_key = options[:primary_key] || :id
     @foreign_key = options[:foreign_key] ||
       "#{self_class_name.tableize.singularize}_id".to_sym
-    @class_name = options[:class_name] || name.camelcase.singularize
+    @class_name = options[:class_name] || name.to_s.camelcase.singularize
   end
 end
 
@@ -49,7 +49,14 @@ module Associatable
   end
 
   def has_many(name, options = {})
-    # ...
+    options = HasManyOptions.new(name, self.name, options)
+
+    define_method(name) do
+      target_class = options.model_class
+      primary_key_value = send(options.primary_key)
+
+      target_class.where(options.foreign_key.to_sym => primary_key_value)
+    end
   end
 
   def assoc_options
