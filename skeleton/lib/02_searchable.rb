@@ -1,18 +1,21 @@
 require_relative 'db_connection'
 require_relative '01_sql_object'
+require_relative 'relation'
 
 module Searchable
   def where(params)
-    where_line = params.keys.map { |key| "#{key} = ?" }.join(" AND ")
+    conditions = params
 
-    result = DBConnection.execute(<<-SQL, params.values)
-      SELECT *
-      FROM #{table_name}
-      WHERE
-        #{where_line}
-    SQL
+    if self.is_a?(Relation)
+      options.each do |k, v|
+        conditions[k] ||= v
+      end
+      model_class = self.model_class
+    else
+      model_class = self
+    end
 
-    parse_all(result)
+    Relation.new(model_class, params)
   end
 end
 
