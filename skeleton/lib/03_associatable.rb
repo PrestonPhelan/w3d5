@@ -42,10 +42,11 @@ module Associatable
     @assoc_options[name] = BelongsToOptions.new(name, options)
 
     define_method(name) do
-      target_class = self.class.assoc_options.model_class
-      foreign_key_value = send(self.class.assoc_options.foreign_key)
-
-      target_class.where(self.class.assoc_options.primary_key.to_sym => foreign_key_value).first
+      target_class = self.class.assoc_options[name].model_class
+      foreign_key_value = send(self.class.assoc_options[name].foreign_key)
+      primary_key_column = self.class.assoc_options[name].primary_key.to_sym
+      target_class
+        .where(primary_key_column => foreign_key_value).first
     end
   end
 
